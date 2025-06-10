@@ -36,15 +36,15 @@ if(count($pacientes) > 0){
             if (!isset($coincidencias[$campo])) continue;
             usort($coincidencias[$campo], fn($a, $b) => $a[0] <=> $b[0]);
             $unificados = [];
-            foreach ($coincidencias[$campo] as $m) {
+            foreach ($coincidencias[$campo] as $c) {
                 if (empty($unificados)) {
-                    $unificados[] = $m;
+                    $unificados[] = $c;
                 } else {
                     $last = &$unificados[count($unificados) - 1];
-                    if ($m[0] <= $last[1]) {
-                        $last[1] = max($last[1], $m[1]);
+                    if ($c[0] <= $last[1]) {
+                        $last[1] = max($last[1], $c[1]);
                     } else {
-                        $unificados[] = $m;
+                        $unificados[] = $c;
                     }
                 }
             }
