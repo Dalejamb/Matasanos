@@ -2,10 +2,10 @@
 require("logica/Persona.php");
 require("logica/Paciente.php");
 
-$filtro = $_GET["filtro"];
+$filtro = isset($_GET["filtro"]) ? $_GET["filtro"] : "";
+$palabras = array_filter(array_map('trim', explode(" ", $filtro)));
 $paciente = new Paciente();
-$pacientes = $paciente->buscar($filtro);
-$palabras = array_filter(explode(" ", $filtro));
+$pacientes = $paciente->buscar($palabras);
 
 if(count($pacientes) > 0){
     echo "<table class='table table-striped table-hover mt-3'>";
@@ -15,28 +15,28 @@ if(count($pacientes) > 0){
         $apellido = $pac->getApellido();
         //$correo = $pac->getCorreo();
         
-        $matches = [];
+        $coincidencias = [];
         foreach ($palabras as $p) {
             if ($p === '') continue;
             preg_match_all("/".preg_quote($p, "/")."/i", strtolower($nombre), $res, PREG_OFFSET_CAPTURE);
-            foreach ($res[0] as $match) {
-                $matches['nombre'][] = [$match[1], $match[1] + strlen($p)];
+            foreach ($res[0] as $coincidencia) {
+                $coincidencias['nombre'][] = [$coincidencia[1], $coincidencia[1] + strlen($p)];
             }
             preg_match_all("/".preg_quote($p, "/")."/i", strtolower($apellido), $res, PREG_OFFSET_CAPTURE);
-            foreach ($res[0] as $match) {
-                $matches['apellido'][] = [$match[1], $match[1] + strlen($p)];
+            foreach ($res[0] as $coincidencia) {
+                $coincidencias['apellido'][] = [$coincidencia[1], $coincidencia[1] + strlen($p)];
             }
             /*preg_match_all("/".preg_quote($p, "/")."/i", strtolower($correo), $res, PREG_OFFSET_CAPTURE);
-            foreach ($res[0] as $match) {
-                $matches['correo'][] = [$match[1], $match[1] + strlen($p)];
+            foreach ($res[0] as $coincidencia) {
+                $coincidencias['correo'][] = [$coincidencia[1], $coincidencia[1] + strlen($p)];
             }*/
         }
 
         foreach (['nombre', 'apellido'/*, 'correo'*/] as $campo) {
-            if (!isset($matches[$campo])) continue;
-            usort($matches[$campo], fn($a, $b) => $a[0] <=> $b[0]);
+            if (!isset($coincidencias[$campo])) continue;
+            usort($coincidencias[$campo], fn($a, $b) => $a[0] <=> $b[0]);
             $unificados = [];
-            foreach ($matches[$campo] as $m) {
+            foreach ($coincidencias[$campo] as $m) {
                 if (empty($unificados)) {
                     $unificados[] = $m;
                 } else {

@@ -30,13 +30,12 @@ class PacienteDAO{
                 where idPaciente = '" . $this -> id . "'";
     }
 
-public function buscar($filtro){
+public function buscar($palabras){
     return "SELECT p.idPaciente, p.nombre, p.apellido, p.correo
             FROM Paciente p
             WHERE " . implode(" AND ", array_map(function($palabra) {
-                $palabra = trim($palabra);
                 return "(p.nombre LIKE '%$palabra%' OR p.apellido LIKE '%$palabra%')";
-            }, array_filter(explode(" ", $filtro))));
+            }, $palabras));
 }
 
 }
